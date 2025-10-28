@@ -1,94 +1,77 @@
-Movie Recommendation Chatbot
-1. Introduction
-Context
+# 🎬 Movie Recommendation Chatbot
 
-With the ever-growing amount of audiovisual content, choosing a movie has become increasingly complex. Streaming platforms offer thousands of options, making it difficult for users to discover films tailored to their preferences. AI-powered chatbots leveraging natural language processing (NLP) offer innovative solutions to personalize user experiences.
+## 1. Introduction
 
-Objective
+### Context
+With the rapid growth of audiovisual content, choosing a movie has become increasingly difficult. Streaming platforms offer thousands of options, making it hard for users to discover films that match their tastes. AI-powered chatbots leveraging natural language processing (NLP) provide an innovative solution to personalize user experiences.
 
-This project develops a chatbot that provides movie recommendations based on user preferences. By analyzing movie features (genres, actors, directors, keywords), the chatbot suggests relevant movies aligned with the user’s tastes.
+### Objective
+This project develops a chatbot capable of providing movie recommendations based on user preferences. By analyzing movie features such as genres, actors, directors, and keywords, the chatbot suggests relevant films tailored to individual tastes.
 
-Scope
+### Scope
+- Content-based recommendation system using structured data (genres, descriptions, ratings).  
+- Recommendations limited to a predefined movie dataset.  
+- Features include search by title or actor.  
+- Excludes social or real-time behavioral recommendations.
 
-Content-based recommendation system using structured data (genres, descriptions, ratings).
+---
 
-Recommendations limited to a predefined movie dataset.
+## 2. Dataset
 
-Features include search by title or actor.
+The project uses an enriched version of the **Full MovieLens Dataset**, combined with **TMDb API** data.  
+It contains metadata for ~45,000 movies and 26 million ratings from 270,000 users (up to July 2017).  
 
-Excludes social or real-time behavioral recommendations.
+### Key Files
+- `movies_metadata.csv` – Movie metadata (budget, revenue, release date, languages, production companies, posters, backdrops).  
+- `keywords.csv` – Movie plot keywords (JSON objects).  
+- `credits.csv` – Detailed cast and crew information (actors, directors).  
+- `links.csv` – Links between TMDb and IMDb IDs.  
+- `ratings_small.csv` – Subset of 100,000 ratings for 9,000 movies.  
 
-2. Dataset
+> **Note:** Users must download the dataset from Kaggle and place the CSV files in a `data/` folder.  
+> [Kaggle TMDb Movie Metadata Dataset](https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata)
 
-The project uses an enriched version of the Full MovieLens Dataset combined with TMDb API data, containing metadata for ~45,000 movies and 26 million ratings from 270,000 users (up to July 2017).
+---
 
-Key Files
+## 3. Model Description
 
-movies_metadata.csv – Main metadata including budget, revenue, release date, languages, production companies, posters, and backdrops.
+### 3.1 Content-Based Recommendation
+- Uses **Sentence-BERT (`all-mpnet-base-v2`)** to generate embeddings for movie descriptions.  
+- User queries are also embedded to compute **cosine similarity** with movie embeddings.
 
-keywords.csv – Movie plot keywords (JSON objects).
+### 3.2 Sentiment Analysis
+- User preferences are analyzed to identify **positive** and **negative** tastes.  
+- Negative preferences are used to filter out movies that the user dislikes.
 
-credits.csv – Detailed cast and crew information (actors, directors).
+### 3.3 Recommendation Pipeline
+1. **Data preprocessing:** Load and merge `movies_metadata.csv`, `keywords.csv`, and `credits.csv`.  
+2. **Combine fields:** Merge genres, keywords, cast, crew, ratings, and overview into a single `combine` column.  
+3. **Embedding generation:** Create embeddings for movies and user queries.  
+4. **Similarity computation:** Calculate cosine similarity between user query and movies.  
+5. **Negative filtering:** Exclude movies that match negative user preferences.  
+6. **Top-N selection:** Return the top N movies ranked by similarity.
 
-links.csv – Links between TMDb and IMDb IDs.
+---
 
-ratings_small.csv – Subset of 100,000 ratings for 9,000 movies.
+## 4. Interface
 
-Note: Users must download the dataset from Kaggle: TMDb Movie Metadata Dataset
- and place the CSV files in a data/ folder.
+The chatbot uses **Streamlit** for an interactive interface:
 
-3. Model Description
-3.1 Content-Based Recommendation
+### Features
+- **Chat input:** Users type preferences in natural language.  
+- **Dynamic results:** Recommended movies appear in real-time.  
+- **Information displayed:** Movie title, genre, main actors, brief description.  
+- **Interactivity:** Results update automatically when preferences change.
 
-The chatbot uses Sentence-BERT (all-mpnet-base-v2) to compute semantic embeddings of movie descriptions. User queries are also transformed into embeddings, allowing the system to compute cosine similarity between user preferences and movie features.
+### Example Queries
+- `"I want a science-fiction adventure with female lead actors."`  
+- `"No horror movies, only comedy or drama."`
 
-3.2 Sentiment Analysis
+---
 
-User preferences are analyzed using sentiment analysis to distinguish between positive and negative tastes. Negative preferences are used to filter out undesirable movies from recommendations.
+## 5. Installation
 
-3.3 Recommendation Pipeline
-
-Data preprocessing: Clean and merge movies_metadata.csv, keywords.csv, and credits.csv.
-
-Combine relevant fields into a single combine column (genres, keywords, cast, crew, ratings, overview).
-
-Embedding generation: Create embeddings for all movies and user queries.
-
-Similarity computation: Compute cosine similarity between the query and movie embeddings.
-
-Negative filtering: Remove movies matching negative user preferences.
-
-Top-N selection: Return the top N movies ranked by similarity.
-
-4. Interface
-
-The chatbot uses Streamlit for an interactive interface:
-
-Chat input: Users type their preferences in natural language.
-
-Dynamic results: Recommended movies are displayed in real-time, ranked by relevance.
-
-Information displayed: Movie title, genre, main actors, and a brief description.
-
-Interactivity: Results update automatically when user preferences change.
-
-5. Installation
-
-Clone the repository
-
+### Clone the Repository
+```bash
 git clone https://github.com/yourusername/movie-chatbot.git
 cd movie-chatbot
-
-
-Install dependencies
-
-pip install -r requirements.txt
-
-
-Download dataset from Kaggle
-Place movies_metadata.csv, keywords.csv, credits.csv in a data/ folder.
-Kaggle TMDb Dataset
-
-Run the chatbot
-
-streamlit run app.py
